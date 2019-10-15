@@ -1,4 +1,5 @@
-<?php 
+<?php
+ob_start();
 // blog id
 if(isset($_GET['id'])){
   $blog_id = $_GET['id'];
@@ -13,27 +14,24 @@ if (!$file_str) {
 } else {
     $blogs = json_decode($file_str, true);
 }
-
-// foreach ($posts as $i => $post) 
-// {
-//     if ($post->id == $id) 
-//     {
-//         unset ($posts[$i]);
-//         $save = json_encode(array_values($posts), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-//         file_put_contents('posts.json', $save);
-//         break;
-//     }
-// }
-
-
 $page_title = 'Blog';
 include('header.php');
 ?>
-
 <div class="container">
     <div class="col">
-    <?php foreach ($blogs as $blog) : 
-        if (in_array($blog_id, $blog)){
+    <?php 
+
+    foreach ($blogs as $blog) : 
+        if (in_array($blog_id, $blog) && isset($_POST['submitdelete'])){ 
+            unset ($blog);
+            $save = json_encode(array_values($blog));
+            file_put_contents('blogs.json', $save);
+       
+            header("HTTP/1.1 301 Moved Permanently");   
+            header("Location:index.php");
+            exit;
+        }
+        if (in_array($blog_id, $blog) && !isset($_POST['submitdelete'])){
         ?>
         <div class="card" style="width: 25rem;">
             <img src="<?php echo $blog['img_url']; ?>" class="card-img-top" alt="...">
@@ -52,10 +50,6 @@ include('header.php');
             </div>
         </div>
     <?php  }
-    if (isset($_POST['submitdelete'])){
-        // unset($blogs[$blog_id]);
-        var_dump('halló');
-    }
     endforeach; ?>
     </div>
 </div>
